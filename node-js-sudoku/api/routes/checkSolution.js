@@ -11,9 +11,10 @@ router.get("/", (req, res, next) => {
 
 router.post("/", (req, res, next) => {
 
-  var gridToSend = JSON.stringify(req.body.grid.gridArr);
+  var initialGrid = JSON.stringify(req.body.grid.initialGrid);
+  var attemptGrid = JSON.stringify(req.body.grid.attemptGrid);
 
-  const pythonProcess = spawn("python.exe", ["./api/routes/sudoku.py", gridToSend]);
+  const pythonProcess = spawn("python.exe", ["./api/routes/sudoku.py", initialGrid, attemptGrid]);
 
   pythonProcess.stdout.on("data", function(data) {
     

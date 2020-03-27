@@ -8,27 +8,98 @@ Algorithm to solve 9x9 Sudoku Grid.
 """
 import sys, json
 
-
-#This list is just for testing myself.
-testgrid = [
-      [0, 5, 0, 6, 3, 2, 9, 4, 1],
-      [0, 0, 4, 0, 0, 0, 3, 0, 0],
-      [9, 2, 3, 0, 0, 0, 0, 0, 8],
-      [0, 9, 0, 3, 2, 4, 0, 0, 0],
-      [0, 0, 5, 0, 0, 0, 8, 0, 0],
-      [0, 0, 0, 8, 5, 6, 0, 9, 0],
-      [3, 0, 0, 0, 0, 0, 6, 8, 9],
-      [0, 0, 6, 0, 0, 0, 4, 0, 0],
-      [4, 8, 9, 2, 6, 1, 0, 7, 0],
-]
-
+'''
+JSON Object Form:
+{
+	"grid": {
+		"initialGrid": 
+    	[
+            [
+				0, 5, 0, 6, 3, 2, 9, 4, 1
+            ],
+            [
+				0, 0, 4, 0, 0, 0, 3, 0, 0
+            ],
+            [
+				9, 2, 3, 0, 0, 0, 0, 0, 8
+            ],
+            [
+				0, 9, 0, 3, 2, 4, 0, 0, 0
+            ],
+            [
+            	0, 0, 5, 0, 0, 0, 8, 0, 0	
+            ],
+            [
+            	0, 0, 0, 8, 5, 6, 0, 9, 0
+            ],
+            [
+            	3, 0, 0, 0, 0, 0, 6, 8, 9
+            ],
+            [
+            	0, 0, 6, 0, 0, 0, 4, 0, 0
+            ],
+            [
+            	4, 8, 9, 2, 6, 1, 0, 7, 0
+            ]
+        ],
+        "attemptGrid": 
+        [
+            [
+				4, 5, 8, 6, 3, 2, 9, 4, 1
+            ],
+            [
+				6, 0, 4, 0, 0, 0, 3, 0, 0
+            ],
+            [
+				9, 2, 3, 0, 0, 0, 0, 0, 8
+            ],
+            [
+				0, 9, 0, 3, 2, 4, 0, 0, 0
+            ],
+            [
+            	0, 0, 5, 0, 0, 0, 8, 0, 0	
+            ],
+            [
+            	0, 0, 0, 8, 5, 6, 0, 9, 0
+            ],
+            [
+            	3, 0, 0, 0, 0, 0, 6, 8, 9
+            ],
+            [
+            	0, 0, 6, 0, 0, 0, 4, 0, 0
+            ],
+            [
+            	4, 8, 9, 2, 6, 1, 0, 7, 0
+            ]
+        ]
+	}
+    
+}
+'''
 
 def main():
-    grid = json.loads(sys.argv[1])
-    print(checkSolution(grid))
+    gridToSolve = json.loads(sys.argv[1])
+    gridAttempt = json.loads(sys.argv[2])
+
+    print("Solvable Grid? : " + str(solve(gridToSolve)))
+    print("Solution Correct? : " + str(checkSolution(gridToSolve, gridAttempt)))
+
     sys.stdout.flush()
 
-def checkSolution(grid): #Returns a boolean
+def checkSolution(gridToSolve, gridAttempt):
+    flattenedSolvedGrid = [j for sub in gridToSolve for j in sub]
+    flattenedAttemptGrid = [j for sub in gridAttempt for j in sub]
+
+    #The assumption here is that the sudoku grid has ONE unique solution.
+    #which is consistent with a valid sudoku grid.
+
+    if (len(flattenedSolvedGrid) == len(flattenedAttemptGrid)):
+        for i in range(len(flattenedSolvedGrid)):
+           if (flattenedSolvedGrid[i] != flattenedAttemptGrid[i]):
+                return False
+    return True
+
+def solve(grid): 
     getZero = check_zero(grid) #Checking for zeroes
 
     if not getZero:
@@ -43,7 +114,7 @@ def checkSolution(grid): #Returns a boolean
             
             grid[row][col] = i  #if valid, replace zero.
 
-            if checkSolution(grid): #recursively solve it.
+            if solve(grid): #recursively solve it.
                 return True
 
             grid[row][col] = 0 #Reset value, sorta backtrack.
