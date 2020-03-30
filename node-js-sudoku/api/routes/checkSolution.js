@@ -10,18 +10,24 @@ router.get("/", (req, res, next) => {
 });
 
 router.post("/", (req, res, next) => {
-
   var initialGrid = JSON.stringify(req.body.grid.initialGrid);
   var attemptGrid = JSON.stringify(req.body.grid.attemptGrid);
 
-  const pythonProcess = spawn("python.exe", ["./api/routes/sudoku.py", initialGrid, attemptGrid]);
+  os = process.platform
+  interpter = "python3"
+  
+  if(os == "win32"){
+    interpter = "python.exe"
+  }
+
+  const pythonProcess = spawn(interpter, ["./api/routes/sudoku.py", initialGrid, attemptGrid]);
 
   pythonProcess.stdout.on("data", function(data) {
     
     console.log(data.toString());
     
-    res.status(201).write(data);
-    res.end('end');
+    res.status(201).send(data);
+    // res.end('end');
   });
 
 });

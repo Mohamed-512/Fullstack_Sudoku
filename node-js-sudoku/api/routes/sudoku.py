@@ -81,8 +81,10 @@ def main():
     gridToSolve = json.loads(sys.argv[1])
     gridAttempt = json.loads(sys.argv[2])
 
-    print("Solvable Grid? : " + str(solve(gridToSolve)))
-    print("Solution Correct? : " + str(checkSolution(gridToSolve, gridAttempt)))
+    # print("Solvable Grid? : " + str(solve(gridToSolve)))
+    # print("Solution Correct? : " + str(checkSolution(gridToSolve, gridAttempt)))
+
+    print('{"Solvable_Grid?":'+str(solve(gridToSolve)).lower()+', "Solution_Correct?":'+str(checkSolution(gridToSolve, gridAttempt)).lower()+"}")
 
     sys.stdout.flush()
 
