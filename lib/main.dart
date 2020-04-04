@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() => runApp(Main());
 
@@ -36,6 +38,18 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 //  0 represents empty space
   List<List<int>> sudokuGrid;
+
+  var initialGrid = [
+    [0, 5, 0, 6, 3, 2, 9, 4, 1],
+    [0, 0, 4, 0, 0, 0, 3, 0, 0],
+    [9, 2, 3, 0, 0, 0, 0, 0, 8],
+    [0, 9, 0, 3, 2, 4, 0, 0, 0],
+    [0, 0, 5, 0, 0, 0, 8, 0, 0],
+    [0, 0, 0, 8, 5, 6, 0, 9, 0],
+    [3, 0, 0, 0, 0, 0, 6, 8, 9],
+    [0, 0, 6, 0, 0, 0, 4, 0, 0],
+    [4, 8, 9, 2, 6, 1, 0, 7, 0],
+  ];
 
   @override
   void initState() {
@@ -112,10 +126,33 @@ class _HomeState extends State<Home> {
                 color: Colors.pink[200],
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                 child: MaterialButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    String loopback = "10.0.2.2";
+                    Map<String, dynamic> body = {
+                      'grid': {'initialGrid': initialGrid, 'attemptGrid': sudokuGrid}
+                    };
+//                    print(json.encode(body));
+                    var response = await http.post(
+                      "http://$loopback:3000/checkSolution",
+                      body: json.encode(body),
+                      headers: {"accept": "application/json", "content-type": "application/json"},
+                    );
+
+                    var res = json.decode(response.body);
+                    bool solvable = res["Solvable_Grid?"];
+                    bool correct = res["Solution_Correct?"];
+
+                    String textToDisplay = "";
+                    if(correct)
+                      textToDisplay = "You Got it right!!";
+                    else if(!correct && solvable)
+                      textToDisplay = "keep trying!";
+                    else if(!correct && !solvable)
+                      textToDisplay = "Don't waste your time";
+
                     Scaffold.of(context).showSnackBar(
                       SnackBar(
-                        content: Text("Under Implementation"),
+                        content: Text(textToDisplay),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
@@ -194,6 +231,7 @@ class _HomeState extends State<Home> {
                             Container(
                               height: MediaQuery.of(context).size.height * 0.2,
                               child: CupertinoPicker(
+                                backgroundColor: Colors.transparent,
                                 itemExtent: MediaQuery.of(context).size.height * 0.048,
                                 onSelectedItemChanged: (i) {
                                   x = i;
