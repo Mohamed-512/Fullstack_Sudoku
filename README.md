@@ -1,6 +1,9 @@
 # Sudoku
 Implementing a Sudoku game using Flutter and NodeJS, with autosolve feature
 
+![](Screenshot from 2020-04-03 14-14-38.png)
+![](Screenshot from 2020-04-03 14-14-46.png)
+
 ### Developed
 * Choosing numbers in the grid
 * Reset grid
