@@ -13,7 +13,6 @@ router.post("/", (req, res, next) => {
   var initialGrid = JSON.stringify(req.body.grid.initialGrid);
   var attemptGrid = JSON.stringify(req.body.grid.attemptGrid);
 
-
   os = process.platform;
   interpter = "python3";
 
@@ -27,9 +26,9 @@ router.post("/", (req, res, next) => {
     attemptGrid,
   ]);
 
-  res.setTimeout(10000, function(){
-    console.log('Request has timed out. Couldnt Solve Grid');
-        res.sendStatus(408);
+  res.setTimeout(10000, function () {
+    console.log("Request has timed out. Couldnt Solve Grid");
+    res.sendStatus(408);
   });
 
   pythonProcess.stdout.on("data", function (data) {

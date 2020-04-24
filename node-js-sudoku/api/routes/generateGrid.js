@@ -3,15 +3,13 @@ const router = express.Router();
 
 const spawn = require("child_process").spawn;
 
-router.get("/", (req, res, next) => {
+router.post("/", (req, res, next) => {
   res.status(200).json({
-    message: "Handling GET requests to /solveGrid",
+    message: "Handling POST requests to /solveGrid",
   });
 });
 
-router.post("/", (req, res, next) => {
-  var attemptGrid = JSON.stringify(req.body.grid.attemptGrid);
-
+router.get("/", (req, res, next) => {
   os = process.platform;
   interpter = "python3";
 
@@ -19,10 +17,7 @@ router.post("/", (req, res, next) => {
     interpter = "python.exe";
   }
 
-  const pythonProcess = spawn(interpter, [
-    "./api/routes/sudoku.py",
-    attemptGrid,
-  ]);
+  const pythonProcess = spawn(interpter, ["./api/routes/sudoku.py"]);
 
   //10 sec upper limit
   res.setTimeout(10000, function () {
