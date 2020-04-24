@@ -27,6 +27,11 @@ router.post("/", (req, res, next) => {
     attemptGrid,
   ]);
 
+  res.setTimeout(10000, function(){
+    console.log('Request has timed out. Couldnt Solve Grid');
+        res.sendStatus(408);
+  });
+
   pythonProcess.stdout.on("data", function (data) {
     console.log(data.toString());
 
