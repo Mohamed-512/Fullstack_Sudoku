@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 
 const checkSolutionRoute = require("./api/routes/checkSolution");
+const solveGridRoute = require("./api/routes/solveGrid");
 
 app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 
 // Routes which should handle requests
 app.use("/checkSolution", checkSolutionRoute);
+app.use("/solveGrid", solveGridRoute);
 
 app.use((req, res, next) => {
   const error = new Error("Not found");

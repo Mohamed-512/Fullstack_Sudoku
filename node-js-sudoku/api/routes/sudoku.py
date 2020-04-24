@@ -78,13 +78,15 @@ JSON Object Form:
 '''
 
 def main():
-    gridToSolve = json.loads(sys.argv[1])
-    gridAttempt = json.loads(sys.argv[2])
-
-    # print("Solvable Grid? : " + str(solve(gridToSolve)))
-    # print("Solution Correct? : " + str(checkSolution(gridToSolve, gridAttempt)))
-
-    print('{"Solvable_Grid?":'+str(solve(gridToSolve)).lower()+', "Solution_Correct?":'+str(checkSolution(gridToSolve, gridAttempt)).lower()+"}")
+    if (len(sys.argv) == 3):
+        gridToSolve = json.loads(sys.argv[1])
+        gridAttempt = json.loads(sys.argv[2])
+        print('{"Solvable_Grid?":'+str(solve(gridToSolve)).lower()+', "Solution_Correct?":'+str(checkSolution(gridToSolve, gridAttempt)).lower()+"}")
+    elif (len(sys.argv) == 2):
+        gridToSolve = json.loads(sys.argv[1])
+        solve(gridToSolve)
+        solvedGrid = { "solvedGrid": gridToSolve }
+        print(json.dumps(solvedGrid))
 
     sys.stdout.flush()
 

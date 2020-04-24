@@ -5,14 +5,12 @@ const spawn = require("child_process").spawn;
 
 router.get("/", (req, res, next) => {
   res.status(200).json({
-    message: "Handling GET requests to /checksolution",
+    message: "Handling GET requests to /solveGrid",
   });
 });
 
 router.post("/", (req, res, next) => {
   var initialGrid = JSON.stringify(req.body.grid.initialGrid);
-  var attemptGrid = JSON.stringify(req.body.grid.attemptGrid);
-
 
   os = process.platform;
   interpter = "python3";
@@ -24,13 +22,13 @@ router.post("/", (req, res, next) => {
   const pythonProcess = spawn(interpter, [
     "./api/routes/sudoku.py",
     initialGrid,
-    attemptGrid,
   ]);
 
   pythonProcess.stdout.on("data", function (data) {
     console.log(data.toString());
 
     res.status(201).send(data);
+    // res.end('end');
   });
 });
 
