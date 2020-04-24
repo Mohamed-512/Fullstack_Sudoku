@@ -94,6 +94,40 @@ class _HomeState extends State<Home> {
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.01,
           ),
+          Card(
+            elevation: 4,
+            color: Colors.yellow[300],
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+            child: MaterialButton(
+              onPressed: () async {
+                String loopback = "10.0.2.2";
+//                    print(json.encode(body));
+                var response = await http.get(
+                  "http://$loopback:3000/generateGrid",
+                  headers: {"accept": "application/json", "content-type": "application/json"},
+                );
+
+                var res = json.decode(response.body);
+                print("\n\n=================MAKING NEW GRID=================");
+                print(res);
+                print("=================================================\n\n");
+
+                List<List<int>> newGrid = (res['initialGrid'] as List).map((l) {
+                  return (l as List).map((i) => double.parse(i.toString()).toInt()).toList();
+                }).toList();
+
+                setState(() {
+                  sudokuGrid = (res['initialGrid'] as List).map((l) {
+                    return (l as List).map((i) => double.parse(i.toString()).toInt()).toList();
+                  }).toList();
+                  initialGrid = (res['initialGrid'] as List).map((l) {
+                    return (l as List).map((i) => double.parse(i.toString()).toInt()).toList();
+                  }).toList();
+                });
+              },
+              child: Text("New Grid"),
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
@@ -106,6 +140,17 @@ class _HomeState extends State<Home> {
                     print("Resetting");
                     setState(() {
                       sudokuGrid = [
+                        [0, 5, 0, 6, 3, 2, 9, 4, 1],
+                        [0, 0, 4, 0, 0, 0, 3, 0, 0],
+                        [9, 2, 3, 0, 0, 0, 0, 0, 8],
+                        [0, 9, 0, 3, 2, 4, 0, 0, 0],
+                        [0, 0, 5, 0, 0, 0, 8, 0, 0],
+                        [0, 0, 0, 8, 5, 6, 0, 9, 0],
+                        [3, 0, 0, 0, 0, 0, 6, 8, 9],
+                        [0, 0, 6, 0, 0, 0, 4, 0, 0],
+                        [4, 8, 9, 2, 6, 1, 0, 7, 0],
+                      ];
+                      initialGrid = [
                         [0, 5, 0, 6, 3, 2, 9, 4, 1],
                         [0, 0, 4, 0, 0, 0, 3, 0, 0],
                         [9, 2, 3, 0, 0, 0, 0, 0, 8],
@@ -131,7 +176,10 @@ class _HomeState extends State<Home> {
                     Map<String, dynamic> body = {
                       'grid': {'initialGrid': initialGrid, 'attemptGrid': sudokuGrid}
                     };
-//                    print(json.encode(body));
+                    print("\n\n=================Checking this solution=================");
+                    print(json.encode(body));
+                    print("==================================================\n\n");
+
                     var response = await http.post(
                       "http://$loopback:3000/checkSolution",
                       body: json.encode(body),
@@ -143,12 +191,11 @@ class _HomeState extends State<Home> {
                     bool correct = res["Solution_Correct?"];
 
                     String textToDisplay = "";
-                    if(correct)
+                    if (correct)
                       textToDisplay = "You Got it right!!";
-                    else if(!correct && solvable)
+                    else if (!correct && solvable)
                       textToDisplay = "keep trying!";
-                    else if(!correct && !solvable)
-                      textToDisplay = "Don't waste your time";
+                    else if (!correct && !solvable) textToDisplay = "Don't waste your time";
 
                     Scaffold.of(context).showSnackBar(
                       SnackBar(
@@ -167,10 +214,37 @@ class _HomeState extends State<Home> {
                 color: Colors.pink[200],
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                 child: MaterialButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    String loopback = "10.0.2.2";
+                    Map<String, dynamic> body = {
+                      'grid': {'attemptGrid': sudokuGrid}
+                    };
+//                    print(json.encode(body));
+                    var response = await http.post(
+                      "http://$loopback:3000/solveGrid",
+                      body: json.encode(body),
+                      headers: {"accept": "application/json", "content-type": "application/json"},
+                    );
+
+                    var res = json.decode(response.body);
+                    print("\n\n=================TRYING TO SOLVE=================");
+                    print(res);
+                    print("=================================================\n\n");
+
+                    List<List<int>> solvedGrid = (res['solvedGrid'] as List).map((l) {
+                      return (l as List).map((i) => int.parse(i.toString())).toList();
+                    }).toList();
+
+                    var couldSolve = res['couldSolve'];
+
+                    if (couldSolve)
+                      setState(() {
+                        sudokuGrid = solvedGrid;
+                      });
+
                     Scaffold.of(context).showSnackBar(
                       SnackBar(
-                        content: Text("Under Implementation"),
+                        content: Text("Grid is ${couldSolve == false ? "not" : ""} solved"),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                       ),
                     );
@@ -265,12 +339,16 @@ class _HomeState extends State<Home> {
                   setState(() {
                     print("Updating sudikuGrid[${iBig + i}][${j + jBig}] to $newNum");
                     sudokuGrid[iBig + i][jBig + j] = newNum;
+                    print(sudokuGrid);
+                    print(initialGrid);
                   });
               },
               child: Text(
                 grid[i][j] != 0 ? "${grid[i][j]}" : "",
                 style: TextStyle(
                   fontSize: 20,
+                  fontWeight: initialGrid[iBig + i][jBig + j] != 0 ? FontWeight.w900 : FontWeight.normal,
+                  fontStyle: initialGrid[iBig + i][jBig + j] != 0 ? FontStyle.normal : FontStyle.italic,
                 ),
               ),
             ),

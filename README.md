@@ -7,9 +7,8 @@ Implementing a Sudoku game using Flutter and NodeJS, with autosolve feature
 * Choosing numbers in the grid
 * Reset grid
 * Solution checking
-
-### Under development
 * Autosolve
+* Auto initial grid (Does't guarantee a solvable grid) 
 
 ## Running
 1) First, set up the server
