@@ -142,13 +142,22 @@ def solve(grid):
 def buildGrid():
     initialGrid = np.zeros((9, 9))
     covered_cells = {}
-    while len(covered_cells) < int(9*9*0.45):
+
+    while len(covered_cells) < 34:
         rand_column = random.randint(0, 8)
         rand_row = random.randint(0, 8)
         rand_num = random.randint(1, 9)
+
         if (rand_row, rand_column) not in covered_cells and isValid(initialGrid, rand_num, (rand_row, rand_column)):
             covered_cells.update({(rand_row, rand_column): rand_num})
             initialGrid[rand_row, rand_column] = rand_num
+        else:
+            continue
+
+        if not solve(initialGrid.tolist()):
+            # Backtracking if the new number make it not solvable
+            del covered_cells[(rand_row, rand_column)]
+            initialGrid[rand_row, rand_column] = 0
 
     return initialGrid.tolist()
 
